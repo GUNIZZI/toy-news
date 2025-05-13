@@ -53,10 +53,7 @@ pipeline {
         }
         always {
             echo 'Cleaning up workspace...'
-            // Ensure cleanWs() is within a node block
-            node {
-                cleanWs()
-            }
+            cleanWs()
         }
     }
 }
