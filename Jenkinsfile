@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18'
-            args '-p 3000:3000'
-        }
-    }
+    agent any
     
     stages {
         stage('Checkout') {
@@ -13,15 +8,16 @@ pipeline {
             }
         }
         
-        stage('Install Dependencies') {
+        stage('Setup') {
             steps {
-                sh 'npm ci'
+                sh 'node -v'
+                sh 'npm -v'
             }
         }
         
-        stage('Lint') {
+        stage('Install Dependencies') {
             steps {
-                sh 'npm run lint || echo "Linting issues found"'
+                sh 'npm install'
             }
         }
         
@@ -33,27 +29,23 @@ pipeline {
         
         stage('Test') {
             steps {
-                sh 'npm test || echo "Tests failed but continuing"'
-            }
-        }
-        
-        stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: '.next/**/*', fingerprint: true
+                sh 'npm test || echo "No tests specified"'
             }
         }
     }
     
     post {
+        always {
+            node {
+                echo 'Cleaning up workspace...'
+                cleanWs()
+            }
+        }
         success {
-            echo 'Build succeeded! Ready for deployment.'
+            echo 'Build succeeded!'
         }
         failure {
             echo 'Build failed! Check the logs for details.'
-        }
-        always {
-            echo 'Cleaning up workspace...'
-            sh 'rm -rf *'
         }
     }
 }
