@@ -53,7 +53,7 @@ pipeline {
         }
         always {
             echo 'Cleaning up workspace...'
-            cleanWs()
+            sh 'rm -rf *'
         }
     }
 }
