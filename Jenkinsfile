@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18'
-            args '-p 3000:3000'
-        }
-    }
+    agent any
     
     stages {
         stage('Checkout') {
@@ -13,9 +8,28 @@ pipeline {
             }
         }
         
+        stage('Setup') {
+            steps {
+                sh 'node -v || echo "Node.js not installed"'
+                sh 'npm -v || echo "npm not installed"'
+            }
+        }
+        
+        stage('Install Node.js') {
+            steps {
+                sh '''
+                if ! command -v node &> /dev/null; then
+                    echo "Installing Node.js..."
+                    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+                    apt-get install -y nodejs
+                fi
+                '''
+            }
+        }
+        
         stage('Install Dependencies') {
             steps {
-                sh 'npm ci'
+                sh 'npm ci || npm install'
             }
         }
         
@@ -52,8 +66,10 @@ pipeline {
             echo 'Build failed! Check the logs for details.'
         }
         always {
-            echo 'Cleaning up workspace...'
-            sh 'rm -rf *'
+            node {
+                echo 'Cleaning up workspace...'
+                cleanWs()
+            }
         }
     }
 }
