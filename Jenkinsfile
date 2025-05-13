@@ -66,10 +66,8 @@ pipeline {
             echo 'Build failed! Check the logs for details.'
         }
         always {
-            node {
-                echo 'Cleaning up workspace...'
-                cleanWs()
-            }
+            echo 'Cleaning up workspace...'
+            cleanWs()
         }
     }
 }
