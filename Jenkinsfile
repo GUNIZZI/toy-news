@@ -1,5 +1,9 @@
 pipeline {
     agent any
+
+    tools {
+        nodejs "nodejs18"  // Global Tool Configuration에서 설정한 이름
+    }
     
     stages {
         stage('Checkout') {
